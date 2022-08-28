@@ -1,10 +1,12 @@
 const express = require("express");
-
 const app = express();
 
-app.get("/home", (req, res) => {
-  res.send("hello");
-});
+// Routes
+const home = require("./routes/home");
+
+
+// Router middleware
+app.use('/api/v1', home);
 
 // export app js
 module.exports = app;
