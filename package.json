@@ -1,0 +1,42 @@
+{
+  "name": "tshirtstore",
+  "version": "1.0.0",
+  "description": "an api for tshirt store",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhin1509/tshirtstore.git"
+  },
+  "keywords": [
+    "api",
+    "backend"
+  ],
+  "author": "Abhinav Kumar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abhin1509/tshirtstore/issues"
+  },
+  "homepage": "https://github.com/abhin1509/tshirtstore#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.30.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "express-fileupload": "^1.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.5.3",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.7.8",
+    "razorpay": "^2.8.3",
+    "stripe": "^10.6.0",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
