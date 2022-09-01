@@ -132,6 +132,7 @@ exports.passwordReset = BigPromise(async (req, res, next) => {
   // token is not encrypted, so encrypting
   const encryToken = crypto.createHash("sha256").update(token).digest("hex");
 
+  // token is in db and is not expired
   const user = await User.findOne({
     encryToken,
     forgotPasswordExpiry: { $gt: Date.now() },
@@ -159,4 +160,13 @@ exports.passwordReset = BigPromise(async (req, res, next) => {
   // or send a token and log in
 
   cookieToken(user, res);
+});
+
+exports.getLoggedInUserDetails = BigPromise(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
 });
