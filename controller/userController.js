@@ -6,7 +6,6 @@ const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
 
 exports.signup = BigPromise(async (req, res, next) => {
-
   if (!req.files) {
     return next(new CustomError("Photo is required for signup", 400));
   }
@@ -35,5 +34,37 @@ exports.signup = BigPromise(async (req, res, next) => {
     },
   });
 
+  cookieToken(user, res);
+});
+
+exports.login = BigPromise(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // Check if both email and password received
+  if (!email || !password) {
+    return next(new CustomError("Please provide email and password", 400));
+  }
+
+  // checking user in db and also select password
+  const user = await User.findOne({ email }).select("+password");
+
+  // If user doesn't exist, we can also send msg that user is not registered
+  if (!user) {
+    return next(
+      new CustomError("Email or password doesn't match or exist", 400)
+    );
+  }
+
+  // checking password
+  const isPasswordCorrect = await user.isValidPassword(password);
+
+  // sending same msg for incorrect password, so user can't bruteforce
+  if (!isPasswordCorrect) {
+    return next(
+      new CustomError("Email or password doesn't match or exist", 400)
+    );
+  }
+
+  // send token
   cookieToken(user, res);
 });
