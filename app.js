@@ -3,6 +3,7 @@ const app = express();
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
+const cloudinary = require("cloudinary").v2;
 
 // for swagger documentation
 const swaggerUi = require("swagger-ui-express");
@@ -16,7 +17,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // cookies and fileUpload middleware
 app.use(cookieParser());
-app.use(fileUpload());
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
 
 // morgan middleware
 app.use(morgan("tiny"));
