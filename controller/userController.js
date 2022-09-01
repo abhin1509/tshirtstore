@@ -5,6 +5,7 @@ const cookieToken = require("../utils/cookieToken");
 const fileUpload = require("express-fileupload");
 const mailHelper = require("../utils/emailHelper");
 const cloudinary = require("cloudinary").v2;
+const crypto = require("crypto");
 
 exports.signup = BigPromise(async (req, res, next) => {
   if (!req.files) {
@@ -93,15 +94,16 @@ exports.forgotPassword = BigPromise(async (req, res, next) => {
     return next(new CustomError("Email not registered!", 400));
   }
 
+  // get token from user model
   const forgotToken = user.getForgotPasswordToken();
 
-  // use to validate if certain fields are there are not
+  // use to validate if certain fields are not there and save in db
   await user.save({ validateBeforeSave: false });
 
   // url for: /password/reset/:token
   const myUrl = `${req.protocol}://${req.get(
     "host"
-  )}/password/reset/${forgotToken}`;
+  )}/api/v1/password/reset/${forgotToken}`;
 
   const message = `Copy paste this link in your URL and hit enter \n\n ${myUrl}`;
 
@@ -122,4 +124,39 @@ exports.forgotPassword = BigPromise(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
     return next(new CustomError(error.message, 500));
   }
+});
+
+exports.passwordReset = BigPromise(async (req, res, next) => {
+  const token = req.params.token;
+
+  // token is not encrypted, so encrypting
+  const encryToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const user = await User.findOne({
+    encryToken,
+    forgotPasswordExpiry: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new CustomError("Token is invalid or expired", 400));
+  }
+
+  // can be checked at frontend as well
+  if (req.body.password !== req.body.confirmPassword) {
+    return next(
+      new CustomError("Password and confirm password do not match", 400)
+    );
+  }
+
+  user.password = req.body.password;
+
+  user.forgotPasswordToken = undefined;
+  user.forgotPasswordExpiry = undefined;
+
+  await user.save();
+
+  // send a json response saying password reset so login
+  // or send a token and log in
+
+  cookieToken(user, res);
 });
