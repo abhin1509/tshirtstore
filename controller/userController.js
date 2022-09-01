@@ -68,3 +68,17 @@ exports.login = BigPromise(async (req, res, next) => {
   // send token
   cookieToken(user, res);
 });
+
+exports.logout = BigPromise(async (req, res, next) => {
+  // we are storing token in cookie
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "logout success",
+  });
+  //todo: also remove token from db
+});
