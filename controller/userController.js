@@ -263,6 +263,32 @@ exports.adminGetOneUser = BigPromise(async (req, res, next) => {
   });
 });
 
+exports.adminUpdateOneUserDetails = BigPromise(async (req, res, next) => {
+  //while updating get all the data from frontend, new as well as existing
+
+  // check for name and email
+  if (!req.body.name || !req.body.email) {
+    return next(new CustomError("Please provide both name and email", 400));
+  }
+
+  const newData = {
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role,
+  };
+
+  const user = await User.findByIdAndUpdate(req.params.id, newData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    success: true,
+    user, //optional depends on frontend
+  });
+});
+
 exports.managerAllUser = BigPromise(async (req, res, next) => {
   const users = await User.find({ role: "user" });
 
