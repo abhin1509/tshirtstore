@@ -289,6 +289,24 @@ exports.adminUpdateOneUserDetails = BigPromise(async (req, res, next) => {
   });
 });
 
+exports.adminDeleteOneUser = BigPromise(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new CustomError("No user found", 404));
+  }
+
+  const imageId = user.photo.id;
+
+  await cloudinary.uploader.destroy(imageId);
+
+  await user.remove();
+
+  res.status(200).json({
+    success: true,
+  });
+});
+
 exports.managerAllUser = BigPromise(async (req, res, next) => {
   const users = await User.find({ role: "user" });
 
