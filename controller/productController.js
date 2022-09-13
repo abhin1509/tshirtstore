@@ -14,7 +14,7 @@ exports.addProduct = BigPromise(async (req, res, next) => {
   }
 
   if (req.files) {
-    for (let index = 0; index < array.length; index++) {
+    for (let index = 0; index < req.files.photos.length; index++) {
       let result = await cloudinary.uploader.upload(
         req.files.photos[index].tempFilePath,
         {
@@ -44,15 +44,17 @@ exports.getAllProduct = BigPromise(async (req, res, next) => {
 
   // Better method
   const resultPerPage = 6; // 3 products in 2 rows
-  const products = new WhereClause(Product.find(), req.query).search().filter();
-
+  const productsObj = new WhereClause(Product.find(), req.query)
+    .search()
+    .filter();
+  let products = await productsObj.base;
   const filteredProductCount = products.length;
 
   // pagination
   // products.limit().skip();
   // Better way
-  products.pager(resultPerPage);
-  products = await products.base;
+  productsObj.pager(resultPerPage);
+  products = await productsObj.base.clone();
 
   res.status(200).json({
     success: true,
