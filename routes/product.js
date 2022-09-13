@@ -16,8 +16,8 @@ const { isLoggedIn, customRole } = require("../middleware/user");
 // user routes
 router.route("/products").get(getAllProduct);
 router.route("/product/:id").get(getOneProduct);
-router.route("/review").put(isLoggedIn ,addReview); //are'nt creating fresh obj, modifying existing product in db
-router.route("/review").delete(isLoggedIn ,deleteReview);
+router.route("/review").put(isLoggedIn, addReview); //are'nt creating fresh obj, modifying existing product in db
+router.route("/review").delete(isLoggedIn, deleteReview);
 router.route("/reviews").get(getAllReviewsForOneProduct);
 
 // admin routes
