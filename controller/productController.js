@@ -2,6 +2,7 @@ const Product = require("../models/product");
 const BigPromise = require("../middleware/bigPromise");
 const CustomError = require("../utils/customError");
 const WhereClause = require("../utils/whereClause");
+const { findById } = require("../models/product");
 const cloudinary = require("cloudinary").v2;
 
 exports.addProduct = BigPromise(async (req, res, next) => {
@@ -74,6 +75,49 @@ exports.getOneProduct = BigPromise(async (req, res, next) => {
   res.status(200).json({
     success: true,
     product,
+  });
+});
+
+exports.addReview = BigPromise(async (req, res, next) => {
+  const { rating, comment, productId } = req.body;
+
+  const review = {
+    user: req.user._id,
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+  };
+
+  // Now match the productId in db
+  const product = await Product.findById(productId);
+
+  const isAlreadyReviewed = product.reviews.find(
+    (rev) => rev.user.toString() === req.user._id.toString()
+  ); //rev is going through every review
+
+  if (isAlreadyReviewed) {
+    product.reviews.forEach((rev) => {
+      if (rev.user.toString() === req.user._id.toString()) {
+        review.comment = comment;
+        review.rating = rating;
+      }
+    });
+  } else {
+    product.reviews.push(review);
+    product.numberOfReviews = product.reviews.length;
+  }
+
+  // adjust ratings
+  product.ratings =
+    product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+    product.reviews.length;
+
+  // save
+
+  await product.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
   });
 });
 
