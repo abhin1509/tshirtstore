@@ -15,7 +15,7 @@ info:
 
 servers:
   - url: "{protocol}://{url}/api/{version}"
-    description: for local host 
+    description: for render host 
     variables:
       version:
         enum:
@@ -25,13 +25,13 @@ servers:
       url:
         enum:
           - localhost:4000
-          - wirteyoururl.com
-        default: localhost:4000
+          - tshirt-store-9djm.onrender.com
+        default: tshirt-store-9djm.onrender.com
       protocol:
         enum:
           - http
           - https
-        default: http
+        default: https
 
 components:
   securitySchemes:
